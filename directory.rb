@@ -8,7 +8,9 @@ def input_students
   students = []
   name = gets.chomp
   while !name.empty? do
-    students << {name: name, cohort: :november}
+    puts "Enter cohort"
+    cohort = gets.chomp
+    students << {name: name, cohort: cohort}
     puts "Now we have #{students.count} students"
     name = gets.chomp
   end
@@ -25,14 +27,29 @@ def print_header
 end
 
 def print(names)
-  names.each do |student|
-    puts "#{student[:name]} (#{student[:cohort]} cohort)"
+  puts "Please give me a letter"
+  letter = gets.chomp
+  names.each.with_index do |student, index|
+    if student[:name].downcase.start_with?(letter) && student[:name].length < 12
+      puts "#{index + 1}.#{student[:name]} (#{student[:cohort]} cohort)"
+    end
+
   end
 end
 
 #finally, we print the total number of students
 def print_footer(names)
+  if names.count == 1
+  puts "Overall, we have #{names.count} great student"
+else
   puts "Overall, we have #{names.count} great students"
+end
+end
+
+def sort_by_cohort(students)
+  students.sort_by{
+    |student|
+    student[:cohort] }
 end
 
 students = input_students
