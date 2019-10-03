@@ -36,7 +36,7 @@ def interactive_menu
     # 1. print the menu and ask the user what to do
     print_menu
     # 2. read the input and save it into a variable
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
@@ -45,13 +45,13 @@ def input_students
   puts " To finish, just hit return twice"
   puts "Please enter the names of the students"
 
-  name = gets.chomp
+  name = STDIN.gets.chomp
   while !name.empty? do
     puts "Enter cohort"
-    cohort = gets.chomp
+    cohort = STDIN.gets.chomp
     @students << {name: name, cohort: cohort.to_sym}
     puts "Now we have #{@students.count} students"
-    name = gets.chomp
+    name = STDIN.gets.chomp
   end
 
 end
@@ -68,13 +68,26 @@ def save_students
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
   file.readlines.each do |line|
   name, cohort = line.chomp.split(',')
     @students << {name: name, cohort: cohort.to_sym}
   end
   file.close
+end
+
+def try_load_students
+  filename = ARGV.first # first argument from the command line
+  puts filename
+  return if filename.nil? # get out of the method if it isn't given
+  if File.exists?(filename) # if it exists]
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else # if it doesn't exist
+    puts "Sorry, #{filename} doesn't exist."
+    exit # quit the program
+  end
 end
 
 def print_header
@@ -84,7 +97,7 @@ end
 
 def print_students_list
   puts "Please give me a letter"
-  letter = gets.chomp
+  letter = STDIN.gets.chomp.downcase
   @students.each.with_index do |student, index|
     if student[:name].downcase.start_with?(letter) && student[:name].length < 12
       puts "#{index + 1}.#{student[:name]} (#{student[:cohort]} cohort)"
@@ -108,4 +121,5 @@ def sort_by_cohort
     student[:cohort] }
 end
 
+try_load_students
 interactive_menu
