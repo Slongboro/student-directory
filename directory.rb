@@ -18,13 +18,21 @@ def process(selection)
   case selection
   when "1"
     input_students
+    puts "thanks!"
   when "2"
     show_students
   when "3"
-    save_students
+    puts "What is the filename?"
+    filename = gets.chomp
+    save_students(filename)
+    puts "saved!"
   when "4"
-    load_students
+    puts "What is the filename?"
+    filename = gets.chomp
+    load_students(filename)
+    puts "loaded!"
   when "9"
+    puts "BYE!!!!"
     exit
   else
     puts "I don't know what you mean, try again"
@@ -41,6 +49,12 @@ def interactive_menu
 end
 
 #first we print the list of students
+def add_student(name, cohort)
+  @students << {name: name, cohort: cohort.to_sym}
+end
+
+
+
 def input_students
   puts " To finish, just hit return twice"
   puts "Please enter the names of the students"
@@ -49,16 +63,15 @@ def input_students
   while !name.empty? do
     puts "Enter cohort"
     cohort = STDIN.gets.chomp
-    @students << {name: name, cohort: cohort.to_sym}
+    add_student(name, cohort)
     puts "Now we have #{@students.count} students"
     name = STDIN.gets.chomp
   end
 
 end
 
-def save_students
-  # open the file for writing
-  file = File.open("students.csv", "w")
+def save_students(filename)
+  file = File.open(filename, "w")
   # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -72,21 +85,19 @@ def load_students(filename = "students.csv")
   file = File.open(filename, "r")
   file.readlines.each do |line|
   name, cohort = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym}
+    add_student(name, cohort)
   end
   file.close
 end
 
 def try_load_students
   filename = ARGV.first # first argument from the command line
-  puts filename
-  return if filename.nil? # get out of the method if it isn't given
-  if File.exists?(filename) # if it exists]
+  if !filename.nil? and File.exists?(filename) # if it exists]
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}"
   else # if it doesn't exist
-    puts "Sorry, #{filename} doesn't exist."
-    exit # quit the program
+    load_students
+  # quit the program
   end
 end
 
